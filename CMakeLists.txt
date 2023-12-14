@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs genmsg)
 
-
+include_directories(${catkin_INCLUDE_DIRS})
 ## Generate added messages and services
 generate_messages(DEPENDENCIES std_msgs)
 

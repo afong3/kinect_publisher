@@ -25,4 +25,4 @@ include_directories(
     ${freenect2_INCLUDE_DIR}
     )
 
-target_link_libraries(main ${freenect2_LIBRARIES})
+target_link_libraries(kinect_publisher ${freenect2_LIBRARIES})

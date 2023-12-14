@@ -24,10 +24,10 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "talker");
     ros::NodeHandle n;
 
-    ros::Publisher kinect_image_pub = n.advertise<std_msgs::Image>("kinect_images", 1);
+    ros::Publisher kinect_image_pub = n.advertise<sensor_msgs::Image>("kinect_images", 1);
     
     // should be a similar procedure for publishing depth, except need to change the encoding, etc. 
-    // ros:Publisher kinect_depth_pub = n.advertise<std_msgs::Image>("kinect_depth", 1);
+    // ros:Publisher kinect_depth_pub = n.advertise<sensor_msgs::Image>("kinect_depth", 1);
 
     ros::Rate loop_rate(10);
 
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
         registration->apply(rgb, depth, &undistorted, &registered);
         
         img.header.seq = rgb->sequence;
-        img.header.stamp = rgb->timestamp;
+        img.header.stamp = ros::Time::now(); // rgb->timestamp;
         img.header.frame_id = "frame_1";
 
         img.height = int(rgb->height);

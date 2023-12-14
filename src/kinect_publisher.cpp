@@ -108,8 +108,8 @@ int main(int argc, char** argv)
         img.header.stamp = rgb->timestamp;
         img.header.frame_id = "frame_1";
 
-        img.height = uint32(rgb->height);
-        img.width = uint32(rgb->width);
+        img.height = int(rgb->height);
+        img.width = int(rgb->width);
         
         // this one definitely is wrong but fix later
         img.encoding = rgb->format;

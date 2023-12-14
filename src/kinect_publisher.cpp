@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "talker");
     ros::NodeHandle n;
 
-    ros:Publisher kinect_image_pub = n.advertise<std_msgs::Image>("kinect_images", 1);
+    ros::Publisher kinect_image_pub = n.advertise<std_msgs::Image>("kinect_images", 1);
     
     // should be a similar procedure for publishing depth, except need to change the encoding, etc. 
     // ros:Publisher kinect_depth_pub = n.advertise<std_msgs::Image>("kinect_depth", 1);
@@ -89,12 +89,12 @@ int main(int argc, char** argv)
     libfreenect2::Frame undistorted(512, 424, 4), registered(512, 424, 4);
 
 
-    while (ros::ok() && !protonect_shutdown && (framemax == (size_t)-1 || framecount < framemax )
+    while (ros::ok() && !protonect_shutdown && (framemax == (size_t)-1 || framecount < framemax ))
     {
-        std_msgs::Image img; 
+        sensor_msgs::Image img; 
 
         // retrieve images from kinect
-        f (!listener.waitForNewFrame(frames, 10*1000)) // 10 seconds
+        if (!listener.waitForNewFrame(frames, 10*1000)) // 10 seconds
         {
             std::cout << "timeout!" << std::endl;
             return -1;
@@ -104,18 +104,18 @@ int main(int argc, char** argv)
         libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
         registration->apply(rgb, depth, &undistorted, &registered);
         
-        img.header.seq = rgb.sequence;
-        img.header.stamp = rgb.timestamp;
+        img.header.seq = rgb->sequence;
+        img.header.stamp = rgb->timestamp;
         img.header.frame_id = "frame_1";
 
-        img.height = uint32(rgb.height);
-        img.width = uint32(rgb.width);
+        img.height = uint32(rgb->height);
+        img.width = uint32(rgb->width);
         
         // this one definitely is wrong but fix later
-        img.encoding = rgb.format;
+        img.encoding = rgb->format;
 
         img.is_bigendian = false;
-        img.step = 3 * rgb.width;
+        img.step = 3 * rgb->width;
 
         listener.release(frames);
         //framecount++;

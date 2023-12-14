@@ -4,7 +4,7 @@ project(kinect_publisher)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS sensor_msgs/image_encodings image_transport roscpp rospy std_msgs genmsg)
+find_package(catkin REQUIRED COMPONENTS sensor_msgs image_transport roscpp rospy std_msgs genmsg)
 
 include_directories(${catkin_INCLUDE_DIRS})
 ## Generate added messages and services

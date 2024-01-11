@@ -22,7 +22,9 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
-
+// pcl ros
+#include <pcl_ros/point_cloud.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 int main(int argc, char** argv)
 {
@@ -31,8 +33,10 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "talker");
     ros::NodeHandle n;
 
-    ros::Publisher kinect_image_pub = n.advertise<sensor_msgs::Image>("kinect_images", 1);
-    
+    typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
+    //ros::Publisher kinect_image_pub = n.advertise<sensor_msgs::Image>("kinect_images", 1);
+    ros::Publisher kinect_cloud_pub = n.advertise<PointCloud>("kinect_clouds", 1);
+   
     // should be a similar procedure for publishing depth, except need to change the encoding, etc. 
     // ros:Publisher kinect_depth_pub = n.advertise<sensor_msgs::Image>("kinect_depth", 1);
 
@@ -142,9 +146,11 @@ int main(int argc, char** argv)
         // a libfreenect2::Frame is almost a 1 to 1 for a sensor_msgs::image
 
         // converting to PCL point cloud, code from https://github.com/OpenKinect/libfreenect2/issues/722
-        pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+        //pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+        PointCloud::Ptr cloud (new PointCloud);
         cloud->header.frame_id = "world";
         cloud->reserve(512 * 424);
+        pcl_conversions::toPCL(ros::Time::now(), cloud->header.stamp);
         for(int r = 0; r < 424; ++r)
         {
             for(int c = 0; c < 512; ++c)
@@ -157,8 +163,8 @@ int main(int argc, char** argv)
         pcl::io::savePCDFileASCII ("test_pcd.pcd", *cloud);
 
         // publish to the topic 
-        kinect_image_pub.publish(img);
-
+        //kinect_image_pub.publish(img);
+        kinect_cloud_pub.publish(*cloud);
 
     }
 

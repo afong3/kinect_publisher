@@ -16,6 +16,13 @@
 #include <cstdlib>
 #include <iostream>
 
+// pcl includes
+#include <iostream>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+
+
 
 int main(int argc, char** argv)
 {
@@ -29,7 +36,7 @@ int main(int argc, char** argv)
     // should be a similar procedure for publishing depth, except need to change the encoding, etc. 
     // ros:Publisher kinect_depth_pub = n.advertise<sensor_msgs::Image>("kinect_depth", 1);
 
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(1); // hz
 
     //////////////////////////////////
     // add libfreenect2 boilerplate //
@@ -39,7 +46,11 @@ int main(int argc, char** argv)
     libfreenect2::Freenect2Device *dev = 0;
     libfreenect2::PacketPipeline *pipeline = 0;
 
-    std::string serial = "";
+    std::string serial = "";        // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>(w, h));
+        
+        // cloud = updateCloud(undistorted, registered, cloud);
+
+        // pcl::io::savePCDFileASCII ("test_pcd.pcd", *cloud);
     bool enable_rgb = true;
     bool enable_depth = true;
     bool protonect_shutdown = false;
@@ -79,7 +90,11 @@ int main(int argc, char** argv)
     else
     {
         if(!dev->startStreams(enable_rgb, enable_depth))
-            return -1;
+            return -1;        // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>(w, h));
+        
+        // cloud = updateCloud(undistorted, registered, cloud);
+
+        // pcl::io::savePCDFileASCII ("test_pcd.pcd", *cloud);
 
     }
     std::cout << "device serial: " << dev->getSerialNumber() << std::endl;
@@ -88,6 +103,7 @@ int main(int argc, char** argv)
     libfreenect2::Registration* registration = new libfreenect2::Registration(dev->getIrCameraParams(), dev->getColorCameraParams());
     libfreenect2::Frame undistorted(512, 424, 4), registered(512, 424, 4);
 
+    
 
     while (ros::ok() && !protonect_shutdown && (framemax == (size_t)-1 || framecount < framemax ))
     {
@@ -125,8 +141,20 @@ int main(int argc, char** argv)
         // get height, width, encoding, is_bigendian, step, and data from libfreenect2 frame
         // a libfreenect2::Frame is almost a 1 to 1 for a sensor_msgs::image
 
-
-
+        // converting to PCL point cloud, code from https://github.com/OpenKinect/libfreenect2/issues/722
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+        cloud->header.frame_id = "world";
+        cloud->reserve(512 * 424);
+        for(int r = 0; r < 424; ++r)
+        {
+            for(int c = 0; c < 512; ++c)
+            {
+                pcl::PointXYZRGB pt;
+                registration->getPointXYZRGB(&undistorted, &registered, r, c, pt.x, pt.y, pt.z, pt.rgb);
+                cloud->push_back(pt);
+            }
+        }
+        pcl::io::savePCDFileASCII ("test_pcd.pcd", *cloud);
 
         // publish to the topic 
         kinect_image_pub.publish(img);

@@ -20,9 +20,22 @@ add_dependencies(kinect_publisher kinect_publisher_generate_messages_cpp)
 ## Libfreenect2 stuff
 
 find_package(freenect2 REQUIRED)
+find_package(PCL 1.3 REQUIRED)
+
+include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(
     "/usr/include/libusb-1.0/"
     ${freenect2_INCLUDE_DIR}
     )
 
-target_link_libraries(kinect_publisher ${freenect2_LIBRARIES})
+## PCL 
+
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
+target_link_libraries(kinect_publisher 
+    ${freenect2_LIBRARIES}
+    ${PCL_LIBRARIES}
+    )
+

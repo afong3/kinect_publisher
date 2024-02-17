@@ -17,10 +17,16 @@ add_executable(kinect_publisher src/kinect_publisher.cpp)
 target_link_libraries(kinect_publisher ${catkin_LIBRARIES})
 add_dependencies(kinect_publisher kinect_publisher_generate_messages_cpp)
 
+add_executable(image_writer src/image_writer.cpp)
+target_link_libraries(image_writer ${catkin_LIBRARIES})
+add_dependencies(image_writer image_writer_generate_messages_cpp)
+
+
 ## Libfreenect2 stuff
 
 find_package(freenect2 REQUIRED)
 find_package(PCL 1.3 REQUIRED)
+find_package(OpenCV)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(
@@ -39,3 +45,8 @@ target_link_libraries(kinect_publisher
     ${PCL_LIBRARIES}
     )
 
+target_link_libraries(image_writer
+    ${freenect2_LIBRARIES}
+    ${PCL_LIBRARIES}
+    ${OpenCV_LIBS}
+    )

@@ -21,6 +21,9 @@ add_executable(image_writer src/image_writer.cpp)
 target_link_libraries(image_writer ${catkin_LIBRARIES})
 add_dependencies(image_writer image_writer_generate_messages_cpp)
 
+add_executable(rgb_depth_publisher src/rgb_depth_publisher.cpp)
+target_link_libraries(rgb_depth_publisher ${catkin_LIBRARIES})
+add_dependencies(rgb_depth_publisher rgb_depth_publisher_generate_messages_cpp)
 
 ## Libfreenect2 stuff
 
@@ -50,3 +53,8 @@ target_link_libraries(image_writer
     ${PCL_LIBRARIES}
     ${OpenCV_LIBS}
     )
+
+target_link_libraries(rgb_depth_publisher
+    ${freenect2_LIBRARIES}
+    ${OpenCV_LIBS}
+)

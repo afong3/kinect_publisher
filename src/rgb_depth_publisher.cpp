@@ -113,7 +113,30 @@ int main(int argc, char** argv)
     libfreenect2::Registration* registration = new libfreenect2::Registration(dev->getIrCameraParams(), dev->getColorCameraParams());
     libfreenect2::Frame undistorted(512, 424, 4), registered(512, 424, 4);
 
+    ROS_INFO("IR_PARAMS_fx: %f", dev->getIrCameraParams().fx);
+    ROS_INFO("IR_PARAMS_fy: %f", dev->getIrCameraParams().fy);
+    ROS_INFO("IR_PARAMS_cx: %f", dev->getIrCameraParams().cx);
+    ROS_INFO("IR_PARAMS_cy: %f", dev->getIrCameraParams().cy);
+    ROS_INFO("IR_PARAMS_k1: %f", dev->getIrCameraParams().k1);
+    ROS_INFO("IR_PARAMS_k2: %f", dev->getIrCameraParams().k2);
+    ROS_INFO("IR_PARAMS_k3: %f", dev->getIrCameraParams().k3);
+    ROS_INFO("IR_PARAMS_p1: %f", dev->getIrCameraParams().p1);
+    ROS_INFO("IR_PARAMS_p2: %f", dev->getIrCameraParams().p2);
+
+    ROS_INFO("COLOR_PARAMS_fx: %f", dev->getColorCameraParams().fx);
+    ROS_INFO("COLOR_PARAMS_fy: %f", dev->getColorCameraParams().fy);
+    ROS_INFO("COLOR_PARAMS_cx: %f", dev->getColorCameraParams().cx);
+    ROS_INFO("COLOR_PARAMS_cy: %f", dev->getColorCameraParams().cy);
     
+
+    // Camera Info from Kinect Factory Settings
+    libfreenect2::Freenect2Device::IrCameraParams IR_params;
+
+    IR_params = {367.629913, 367.629913, 261.900604, 208.773300, 0.087892, -0.271278, 0.096343, 0.000000, 0.000000};
+
+    libfreenect2::Freenect2Device::ColorCameraParams color_params;
+
+    color_params = {1081.372070, 1081.372070, 959.500000, 539.500000};
 
     while (ros::ok() && !protonect_shutdown && (framemax == (size_t)-1 || framecount < framemax ))
     {
@@ -129,6 +152,7 @@ int main(int argc, char** argv)
         libfreenect2::Frame *rgb = frames[libfreenect2::Frame::Color];
         libfreenect2::Frame *ir = frames[libfreenect2::Frame::Ir];
         libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
+
         registration->apply(rgb, depth, &undistorted, &registered);
         
         cv::Mat matDepth, matColor;

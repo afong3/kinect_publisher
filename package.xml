@@ -11,11 +11,17 @@
 
     <depend>roscpp</depend>
     <depend>std_msgs</depend>
+    <depend>sensor_msgs</depend>
 
     <build_depend>message_generation</build_depend>
     <build_depend>freenect2</build_depend>
     <build_depend>opencv</build_depend>
-
+    <build_depend>cv_bridge</build_depend> 
+    <build_depend>image_transport</build_depend>
+    <depend>message_filters</depend>
+	
     <exec_depend>message_runtime</exec_depend>
     <exec_depend>rospy</exec_depend>
+
+	
 </package>

@@ -169,7 +169,7 @@ int main(int argc, char** argv)
         msgRgb.width = int(rgb->width);
         
         // this one definitely is wrong but fix later
-        msgRgb.encoding = rgb->format;
+        msgRgb.encoding = "8UC4";
 
         msgRgb.is_bigendian = false;
         msgRgb.step = matColor.elemSize() * matColor.cols;
@@ -184,7 +184,7 @@ int main(int argc, char** argv)
         msgDepth.width = int(depth->width);
         
         // this one definitely is wrong but fix later
-        msgDepth.encoding = depth->format;
+        msgDepth.encoding = "32FC1";
 
         msgDepth.is_bigendian = false;
         msgDepth.step = matDepth.elemSize() * matDepth.cols;

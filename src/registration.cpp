@@ -32,9 +32,9 @@
 #include <message_filters/time_synchronizer.h>
 #include <sensor_msgs/Image.h> 
 
-// opencv
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgcodecs.hpp> 
+// // opencv
+// #include <opencv2/core/core.hpp>
+// #include <opencv2/imgcodecs.hpp> 
 
 //cv_bridge
 #include <cv_bridge/cv_bridge.h>
@@ -53,17 +53,18 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
 // ROS Publisher 
 ros::Publisher pub;
 
-void callback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::ImageConstPtr& depth_msg, libfreenect2::Registration* registration)
+// void callback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::ImageConstPtr& depth_msg, libfreenect2::Registration* registration)
+void callback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::ImageConstPtr& depth_msg, const libfreenect2::Registration* registration)
 {
-        ROS_INFO("hmmmm");
-
         libfreenect2::Frame undistorted = libfreenect2::Frame(512, 424, 4);
         libfreenect2::Frame registered = libfreenect2::Frame(512, 424, 4);
 
-        cv_bridge::CvImagePtr cv_ptr_color;
+        cv_bridge::CvImageConstPtr cv_ptr_color;
+        cv::Mat mat_color;
 
         try{
-            cv_ptr_color = cv_bridge::toCvCopy(color_msg, "8UC4");
+            cv_ptr_color = cv_bridge::toCvShare(color_msg, "bgra8");
+
         }
         catch (cv_bridge::Exception& e)
         {
@@ -82,27 +83,30 @@ void callback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::Im
             return;
         }
 
-        // Create libfreenect2::Frame's to use the Registration method
-        libfreenect2::Frame frame_color(color_msg->width, color_msg->height, 1);
-        libfreenect2::Frame frame_depth(depth_msg->width, depth_msg->height, 4);
+        libfreenect2::Frame *frame_color = new libfreenect2::Frame(1920, 1080, 4, cv_ptr_color->image.data);
+        libfreenect2::Frame *frame_depth = new libfreenect2::Frame(512, 424, 4, cv_ptr_depth->image.data);
+        // invalid format
+        frame_color->format = libfreenect2::Frame::Format::BGRX;
+        frame_depth->format = libfreenect2::Frame::Format::Float;
 
-        frame_color.data = cv_ptr_color->image.data;
-        frame_depth.data = cv_ptr_depth->image.data;
+        registration->apply(frame_color, frame_depth, &undistorted, &registered);
 
-        registration->apply(&frame_color, &frame_depth, &undistorted, &registered);
-
-        // pcl_conversions::moveFromPCL(cloud_filtered, output);
         PointCloud::Ptr cloud (new PointCloud);
         cloud->header.frame_id = "table_frame";
         cloud->reserve(512 * 424);
         pcl_conversions::toPCL(color_msg->header.stamp, cloud->header.stamp);
+        int k = 0;
         for(int r = 0; r < 424; ++r)
         {
+            k++;
             for(int c = 0; c < 512; ++c)
             {
                 pcl::PointXYZRGB pt;
+                
                 registration->getPointXYZRGB(&undistorted, &registered, r, c, pt.x, pt.y, pt.z, pt.rgb);
+
                 cloud->push_back(pt);
+
             }
         }
         // Publish the data
@@ -111,7 +115,7 @@ void callback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::Im
 
 int main(int argc, char **argv)
 {
-  // Initialize the ROS Node "roscpp_pcl_example"
+    // Initialize the ROS Node "roscpp_pcl_example"
     ros::init (argc, argv, "registration");
     ros::NodeHandle nh;
 
@@ -119,9 +123,13 @@ int main(int argc, char **argv)
     pub = nh.advertise<sensor_msgs::PointCloud2>(PUBLISH_TOPIC, 1);
 
     libfreenect2::Freenect2Device::IrCameraParams IR_params;
-    libfreenect2::Freenect2Device::ColorCameraParams color_params;
+
     IR_params = {367.629913, 367.629913, 261.900604, 208.773300, 0.087892, -0.271278, 0.096343, 0.000000, 0.000000};
-    color_params = {1081.372070, 1081.372070, 959.500000, 539.500000};
+
+    libfreenect2::Freenect2Device::ColorCameraParams color_params;
+
+    color_params = {1081.372070, 1081.372070, 959.500000, 539.500000, 863.000000, 52.000000, 0.000663, -0.000024, -0.000046, 0.000505, -0.000305, -0.000219, 0.000740, 0.634050, -0.000641, 0.150087, 0.000026, 0.000847, 0.000550, 0.000078, 0.000091, 0.000805, -0.000293, 0.000646, 0.634342, -0.040878};
+
     libfreenect2::Registration* registration = new libfreenect2::Registration(IR_params, color_params);
     
     // Create a ROS Subscriber to IMAGE_TOPIC with a queue_size of 1 and a callback function to cloud_cb
@@ -133,10 +141,6 @@ int main(int argc, char **argv)
     
     // sync.registerCallback(boost::bind(&Node::callback, node, _1, _2));
     sync.registerCallback(boost::bind(&callback, _1, _2, registration));
-
-    ROS_INFO("7");
-   
-
 
     // Spin
     ros::spin();

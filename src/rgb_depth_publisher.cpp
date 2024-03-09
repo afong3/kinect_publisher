@@ -38,13 +38,8 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
 
     typedef sensor_msgs::Image Image;
-    //ros::Publisher kinect_image_pub = n.advertise<sensor_msgs::Image>("kinect_images", 1);
     ros::Publisher kinect_rgb_pub = n.advertise<Image>("kinect_rgb", 1);
     ros::Publisher kinect_depth_pub = n.advertise<Image>("kinect_depth", 1);
-
-   
-    // should be a similar procedure for publishing depth, except need to change the encoding, etc. 
-    // ros:Publisher kinect_depth_pub = n.advertise<sensor_msgs::Image>("kinect_depth", 1);
 
     ros::Rate loop_rate(1); // hz
 
@@ -56,11 +51,8 @@ int main(int argc, char** argv)
     libfreenect2::Freenect2Device *dev = 0;
     libfreenect2::PacketPipeline *pipeline = 0;
 
-    std::string serial = "";        // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>(w, h));
-        
-        // cloud = updateCloud(undistorted, registered, cloud);
+    std::string serial = "";     
 
-        // pcl::io::savePCDFileASCII ("test_pcd.pcd", *cloud);
     bool enable_rgb = true;
     bool enable_depth = true;
     bool protonect_shutdown = false;
@@ -100,43 +92,50 @@ int main(int argc, char** argv)
     else
     {
         if(!dev->startStreams(enable_rgb, enable_depth))
-            return -1;        // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>(w, h));
-        
-        // cloud = updateCloud(undistorted, registered, cloud);
-
-        // pcl::io::savePCDFileASCII ("test_pcd.pcd", *cloud);
-
+            return -1;        
     }
     std::cout << "device serial: " << dev->getSerialNumber() << std::endl;
     std::cout << "device firmware: " << dev->getFirmwareVersion() << std::endl;
 
-    libfreenect2::Registration* registration = new libfreenect2::Registration(dev->getIrCameraParams(), dev->getColorCameraParams());
-    libfreenect2::Frame undistorted(512, 424, 4), registered(512, 424, 4);
+    libfreenect2::Freenect2Device::IrCameraParams IR_params = dev->getIrCameraParams();
+    libfreenect2::Freenect2Device::ColorCameraParams color_params = dev->getColorCameraParams();
 
-    ROS_INFO("IR_PARAMS_fx: %f", dev->getIrCameraParams().fx);
-    ROS_INFO("IR_PARAMS_fy: %f", dev->getIrCameraParams().fy);
-    ROS_INFO("IR_PARAMS_cx: %f", dev->getIrCameraParams().cx);
-    ROS_INFO("IR_PARAMS_cy: %f", dev->getIrCameraParams().cy);
-    ROS_INFO("IR_PARAMS_k1: %f", dev->getIrCameraParams().k1);
-    ROS_INFO("IR_PARAMS_k2: %f", dev->getIrCameraParams().k2);
-    ROS_INFO("IR_PARAMS_k3: %f", dev->getIrCameraParams().k3);
-    ROS_INFO("IR_PARAMS_p1: %f", dev->getIrCameraParams().p1);
-    ROS_INFO("IR_PARAMS_p2: %f", dev->getIrCameraParams().p2);
+    ROS_INFO("IR_PARAMS_fx: %f", IR_params.fx);
+    ROS_INFO("IR_PARAMS_fy: %f", IR_params.fy);
+    ROS_INFO("IR_PARAMS_cx: %f", IR_params.cx);
+    ROS_INFO("IR_PARAMS_cy: %f", IR_params.cy);
+    ROS_INFO("IR_PARAMS_k1: %f", IR_params.k1);
+    ROS_INFO("IR_PARAMS_k2: %f", IR_params.k2);
+    ROS_INFO("IR_PARAMS_k3: %f", IR_params.k3);
+    ROS_INFO("IR_PARAMS_p1: %f", IR_params.p1);
+    ROS_INFO("IR_PARAMS_p2: %f", IR_params.p2);
 
-    ROS_INFO("COLOR_PARAMS_fx: %f", dev->getColorCameraParams().fx);
-    ROS_INFO("COLOR_PARAMS_fy: %f", dev->getColorCameraParams().fy);
-    ROS_INFO("COLOR_PARAMS_cx: %f", dev->getColorCameraParams().cx);
-    ROS_INFO("COLOR_PARAMS_cy: %f", dev->getColorCameraParams().cy);
-    
-
-    // Camera Info from Kinect Factory Settings
-    libfreenect2::Freenect2Device::IrCameraParams IR_params;
-
-    IR_params = {367.629913, 367.629913, 261.900604, 208.773300, 0.087892, -0.271278, 0.096343, 0.000000, 0.000000};
-
-    libfreenect2::Freenect2Device::ColorCameraParams color_params;
-
-    color_params = {1081.372070, 1081.372070, 959.500000, 539.500000};
+    ROS_INFO("COLOR_PARAMS_fx: %f", color_params.fx);
+    ROS_INFO("COLOR_PARAMS_fy: %f", color_params.fy);
+    ROS_INFO("COLOR_PARAMS_cx: %f", color_params.cx);
+    ROS_INFO("COLOR_PARAMS_cy: %f", color_params.cy);
+    ROS_INFO("COLOR_PARAMS_shift_d: %f", color_params.shift_d);
+    ROS_INFO("COLOR_PARAMS_shift_m: %f", color_params.shift_m);
+    ROS_INFO("COLOR_PARAMS_mx_x3y0: %f", color_params.mx_x3y0);
+    ROS_INFO("COLOR_PARAMS_mx_x0y3: %f", color_params.mx_x0y3);
+    ROS_INFO("COLOR_PARAMS_mx_x2y1: %f", color_params.mx_x2y1);
+    ROS_INFO("COLOR_PARAMS_mx_x1y2: %f", color_params.mx_x1y2);
+    ROS_INFO("COLOR_PARAMS_mx_x2y0: %f", color_params.mx_x2y0);
+    ROS_INFO("COLOR_PARAMS_mx_x0y2: %f", color_params.mx_x0y2);
+    ROS_INFO("COLOR_PARAMS_mx_x1y1: %f", color_params.mx_x1y1);
+    ROS_INFO("COLOR_PARAMS_mx_x1y0: %f", color_params.mx_x1y0);
+    ROS_INFO("COLOR_PARAMS_mx_x0y1: %f", color_params.mx_x0y1);
+    ROS_INFO("COLOR_PARAMS_mx_x0y0: %f", color_params.mx_x0y0);
+    ROS_INFO("COLOR_PARAMS_my_x3y0: %f", color_params.my_x3y0);
+    ROS_INFO("COLOR_PARAMS_my_x0y3: %f", color_params.my_x0y3);
+    ROS_INFO("COLOR_PARAMS_my_x2y1: %f", color_params.my_x2y1);
+    ROS_INFO("COLOR_PARAMS_my_x1y2: %f", color_params.my_x1y2);
+    ROS_INFO("COLOR_PARAMS_my_x2y0: %f", color_params.my_x2y0);
+    ROS_INFO("COLOR_PARAMS_my_x0y2: %f", color_params.my_x0y2);
+    ROS_INFO("COLOR_PARAMS_my_x1y1: %f", color_params.my_x1y1);
+    ROS_INFO("COLOR_PARAMS_my_x1y0: %f", color_params.my_x1y0);
+    ROS_INFO("COLOR_PARAMS_my_x0y1: %f", color_params.my_x0y1);
+    ROS_INFO("COLOR_PARAMS_my_x0y0: %f", color_params.my_x0y0);
 
     while (ros::ok() && !protonect_shutdown && (framemax == (size_t)-1 || framecount < framemax ))
     {
@@ -153,23 +152,22 @@ int main(int argc, char** argv)
         libfreenect2::Frame *ir = frames[libfreenect2::Frame::Ir];
         libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
 
-        registration->apply(rgb, depth, &undistorted, &registered);
+        // registration->apply(rgb, depth, &undistorted, &registered);
         
         cv::Mat matDepth, matColor;
         cv::Mat(depth->height, depth->width, CV_32FC1, depth->data).copyTo(matDepth);
         cv::Mat(rgb->height, rgb->width, CV_8UC4, rgb->data).copyTo(matColor);
 
-
         // look at createHeader in https://github.com/code-iai/iai_kinect2/blob/master/kinect2_bridge/src/kinect2_bridge.cpp#L1374
         msgRgb.header.seq = 0;
-        msgRgb.header.stamp = ros::Time::now(); // rgb->timestamp;
+        msgRgb.header.stamp = ros::Time::now(); 
         msgRgb.header.frame_id = "table_frame";
 
         msgRgb.height = int(rgb->height);
         msgRgb.width = int(rgb->width);
         
         // this one definitely is wrong but fix later
-        msgRgb.encoding = "8UC4";
+        msgRgb.encoding = "bgra8";
 
         msgRgb.is_bigendian = false;
         msgRgb.step = matColor.elemSize() * matColor.cols;
@@ -177,13 +175,12 @@ int main(int argc, char** argv)
         memcpy(msgRgb.data.data(), matColor.data, matColor.cols * matColor.elemSize() * matColor.rows);
 
         msgDepth.header.seq = 0;
-        msgDepth.header.stamp = msgRgb.header.stamp; // rgb->timestamp;
+        msgDepth.header.stamp = msgRgb.header.stamp; 
         msgDepth.header.frame_id = "table_frame";
 
         msgDepth.height = int(depth->height);
         msgDepth.width = int(depth->width);
         
-        // this one definitely is wrong but fix later
         msgDepth.encoding = "32FC1";
 
         msgDepth.is_bigendian = false;
@@ -194,13 +191,8 @@ int main(int argc, char** argv)
         
         listener.release(frames);
 
-        // publish to the topic 
-        //kinect_image_pub.publish(img);
         kinect_rgb_pub.publish(msgRgb);
         kinect_depth_pub.publish(msgDepth);
-
-        // kinect_depth_pub.publish(msgDepth);
-
     }
 
     dev->stop();

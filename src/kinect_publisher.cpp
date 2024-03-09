@@ -104,8 +104,60 @@ int main(int argc, char** argv)
     std::cout << "device serial: " << dev->getSerialNumber() << std::endl;
     std::cout << "device firmware: " << dev->getFirmwareVersion() << std::endl;
 
-    libfreenect2::Registration* registration = new libfreenect2::Registration(dev->getIrCameraParams(), dev->getColorCameraParams());
+    // libfreenect2::Freenect2Device::IrCameraParams IR_params = dev->getIrCameraParams() ;
+    // libfreenect2::Freenect2Device::ColorCameraParams color_params = dev->getColorCameraParams();
+
+    libfreenect2::Freenect2Device::IrCameraParams IR_params;
+
+    IR_params = {367.629913, 367.629913, 261.900604, 208.773300, 0.087892, -0.271278, 0.096343, 0.000000, 0.000000};
+
+    libfreenect2::Freenect2Device::ColorCameraParams color_params;
+
+    color_params = {1081.372070, 1081.372070, 959.500000, 539.500000, 863.000000, 52.000000, 0.000663, -0.000024, -0.000046, 0.000505, -0.000305, -0.000219, 0.000740, 0.634050, -0.000641, 0.150087, 0.000026, 0.000847, 0.000550, 0.000078, 0.000091, 0.000805, -0.000293, 0.000646, 0.634342, -0.040878};
+
+
+    // libfreenect2::Registration* registration = new libfreenect2::Registration(dev->getIrCameraParams(), dev->getColorCameraParams());
+    libfreenect2::Registration* registration = new libfreenect2::Registration(IR_params, color_params);
+    
     libfreenect2::Frame undistorted(512, 424, 4), registered(512, 424, 4);
+
+    ROS_INFO("IR_PARAMS_fx: %f", IR_params.fx);
+    ROS_INFO("IR_PARAMS_fy: %f", IR_params.fy);
+    ROS_INFO("IR_PARAMS_cx: %f", IR_params.cx);
+    ROS_INFO("IR_PARAMS_cy: %f", IR_params.cy);
+    ROS_INFO("IR_PARAMS_k1: %f", IR_params.k1);
+    ROS_INFO("IR_PARAMS_k2: %f", IR_params.k2);
+    ROS_INFO("IR_PARAMS_k3: %f", IR_params.k3);
+    ROS_INFO("IR_PARAMS_p1: %f", IR_params.p1);
+    ROS_INFO("IR_PARAMS_p2: %f", IR_params.p2);
+
+    ROS_INFO("COLOR_PARAMS_fx: %f", color_params.fx);
+    ROS_INFO("COLOR_PARAMS_fy: %f", color_params.fy);
+    ROS_INFO("COLOR_PARAMS_cx: %f", color_params.cx);
+    ROS_INFO("COLOR_PARAMS_cy: %f", color_params.cy);
+    ROS_INFO("COLOR_PARAMS_shift_d: %f", color_params.shift_d);
+    ROS_INFO("COLOR_PARAMS_shift_m: %f", color_params.shift_m);
+    ROS_INFO("COLOR_PARAMS_mx_x3y0: %f", color_params.mx_x3y0);
+    ROS_INFO("COLOR_PARAMS_mx_x0y3: %f", color_params.mx_x0y3);
+    ROS_INFO("COLOR_PARAMS_mx_x2y1: %f", color_params.mx_x2y1);
+    ROS_INFO("COLOR_PARAMS_mx_x1y2: %f", color_params.mx_x1y2);
+    ROS_INFO("COLOR_PARAMS_mx_x2y0: %f", color_params.mx_x2y0);
+    ROS_INFO("COLOR_PARAMS_mx_x0y2: %f", color_params.mx_x0y2);
+    ROS_INFO("COLOR_PARAMS_mx_x1y1: %f", color_params.mx_x1y1);
+    ROS_INFO("COLOR_PARAMS_mx_x1y0: %f", color_params.mx_x1y0);
+    ROS_INFO("COLOR_PARAMS_mx_x0y1: %f", color_params.mx_x0y1);
+    ROS_INFO("COLOR_PARAMS_mx_x0y0: %f", color_params.mx_x0y0);
+    ROS_INFO("COLOR_PARAMS_my_x3y0: %f", color_params.my_x3y0);
+    ROS_INFO("COLOR_PARAMS_my_x0y3: %f", color_params.my_x0y3);
+    ROS_INFO("COLOR_PARAMS_my_x2y1: %f", color_params.my_x2y1);
+    ROS_INFO("COLOR_PARAMS_my_x1y2: %f", color_params.my_x1y2);
+    ROS_INFO("COLOR_PARAMS_my_x2y0: %f", color_params.my_x2y0);
+    ROS_INFO("COLOR_PARAMS_my_x0y2: %f", color_params.my_x0y2);
+    ROS_INFO("COLOR_PARAMS_my_x1y1: %f", color_params.my_x1y1);
+    ROS_INFO("COLOR_PARAMS_my_x1y0: %f", color_params.my_x1y0);
+    ROS_INFO("COLOR_PARAMS_my_x0y1: %f", color_params.my_x0y1);
+    ROS_INFO("COLOR_PARAMS_my_x0y0: %f", color_params.my_x0y0);
+
 
     
 

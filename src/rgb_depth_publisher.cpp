@@ -193,6 +193,7 @@ int main(int argc, char** argv)
 
         kinect_rgb_pub.publish(msgRgb);
         kinect_depth_pub.publish(msgDepth);
+        loop_rate.sleep();
     }
 
     dev->stop();

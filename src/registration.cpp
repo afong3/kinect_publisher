@@ -92,7 +92,7 @@ void callback(const sensor_msgs::ImageConstPtr& color_msg, const sensor_msgs::Im
         registration->apply(frame_color, frame_depth, &undistorted, &registered);
 
         PointCloud::Ptr cloud (new PointCloud);
-        cloud->header.frame_id = "table_frame";
+        cloud->header.frame_id = "camera_depth_optical_frame";
         cloud->reserve(512 * 424);
         pcl_conversions::toPCL(color_msg->header.stamp, cloud->header.stamp);
         int k = 0;

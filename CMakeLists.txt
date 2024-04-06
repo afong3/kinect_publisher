@@ -68,3 +68,7 @@ target_link_libraries(registration
    ${OpenCV_LIBS}  
    ${PCL_LIBRARIES}
 )
+
+catkin_install_python(PROGRAMS scripts/object_classifier.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

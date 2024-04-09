@@ -73,7 +73,9 @@ int main(int argc, char** argv)
         serial = freenect2.getDefaultDeviceSerialNumber();
     }
 
-    pipeline = new libfreenect2::CudaPacketPipeline(0);
+    // pipeline = new libfreenect2::CudaPacketPipeline(0);
+    pipeline = new libfreenect2::CpuPacketPipeline();
+
     dev = freenect2.openDevice(serial, pipeline);
     int types = 0;
     if (enable_rgb){

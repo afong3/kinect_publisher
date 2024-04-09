@@ -43,6 +43,8 @@
 
 // Topics
 static const std::string COLOR_TOPIC = "/kinect_rgb";
+// static const std::string COLOR_TOPIC = "/kinect_classified";
+
 static const std::string DEPTH_TOPIC = "/kinect_depth";
 //static const std::string COLOR_TOPIC = "";
 static const std::string PUBLISH_TOPIC = "/kinect_registered";
@@ -133,11 +135,11 @@ int main(int argc, char **argv)
     libfreenect2::Registration* registration = new libfreenect2::Registration(IR_params, color_params);
     
     // Create a ROS Subscriber to IMAGE_TOPIC with a queue_size of 1 and a callback function to cloud_cb
-    message_filters::Subscriber<sensor_msgs::Image> color_sub(nh, COLOR_TOPIC, 5);
+    message_filters::Subscriber<sensor_msgs::Image> color_sub(nh, COLOR_TOPIC, 15);
     
-    message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, DEPTH_TOPIC, 5);
+    message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, DEPTH_TOPIC, 15);
     
-    message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> sync(color_sub, depth_sub, 5); 
+    message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> sync(color_sub, depth_sub, 15); 
     
     // sync.registerCallback(boost::bind(&Node::callback, node, _1, _2));
     sync.registerCallback(boost::bind(&callback, _1, _2, registration));

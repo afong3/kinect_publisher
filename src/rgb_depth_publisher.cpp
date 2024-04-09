@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     ros::Publisher kinect_rgb_pub = n.advertise<Image>("kinect_rgb", 1);
     ros::Publisher kinect_depth_pub = n.advertise<Image>("kinect_depth", 1);
 
-    ros::Rate loop_rate(1); // hz
+    ros::Rate loop_rate(0.25); // hz
 
     //////////////////////////////////
     // add libfreenect2 boilerplate //
@@ -71,7 +71,9 @@ int main(int argc, char** argv)
         serial = freenect2.getDefaultDeviceSerialNumber();
     }
 
-    pipeline = new libfreenect2::CudaPacketPipeline(0);
+    // pipeline = new libfreenect2::CudaPacketPipeline(0);
+    pipeline = new libfreenect2::CpuPacketPipeline();
+
     dev = freenect2.openDevice(serial, pipeline);
     int types = 0;
     if (enable_rgb){

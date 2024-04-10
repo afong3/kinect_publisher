@@ -4,14 +4,33 @@ project(kinect_publisher)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS message_filters sensor_msgs image_transport roscpp rospy std_msgs genmsg cv_bridge)
+find_package(catkin REQUIRED COMPONENTS 
+  message_filters 
+  sensor_msgs 
+  image_transport 
+  roscpp 
+  rospy 
+  std_msgs 
+  genmsg 
+  cv_bridge 
+  message_generation
+  geometry_msgs)
 
-include_directories(${catkin_INCLUDE_DIRS})
+add_message_files(
+  FILES
+  ObjectArray.msg
+  )
+
 ## Generate added messages and services
-generate_messages(DEPENDENCIES std_msgs)
-
-## Declare a catkin package
+generate_messages(
+  DEPENDENCIES 
+  std_msgs
+  geometry_msgs
+  )
+  
+  ## Declare a catkin package
 catkin_package()
+include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(kinect_publisher src/kinect_publisher.cpp)
 target_link_libraries(kinect_publisher ${catkin_LIBRARIES})

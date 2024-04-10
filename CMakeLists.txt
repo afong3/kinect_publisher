@@ -88,6 +88,9 @@ target_link_libraries(registration
    ${PCL_LIBRARIES}
 )
 
-catkin_install_python(PROGRAMS scripts/object_classifier.py
+catkin_install_python(
+  PROGRAMS 
+  scripts/object_classifier.py
+  scripts/object_classifier_roboflow.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

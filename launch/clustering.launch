@@ -1,0 +1,20 @@
+<launch>
+ 
+  <arg name="min_z" default="0.5" doc="Minimum z distance between camera and table" />
+  <!-- Kinect like interface -->
+
+
+  <!-- Openni standard (such as Asus Xtion) -->
+
+
+  <!-- intel realsense, which publishes on /camera/depth/color/points instead of /camera/depth/points -->
+  <remap from="/camera/depth/color/points" to="/camera/depth/points" />
+
+  <!-- cluster extraction... Extract the clusters of whatever is left on the
+       table. Right now, the max number of clusters is hard coded to be 3. -->
+  <!-- <node pkg="kinect_publisher" name="object_classifier_roboflow" type="object_classifier_roboflow.py" output="screen" />
+    <remap from="~kinect_rgb" to="/point_cloud_generation/kinect_rgb" /> -->
+  <node pkg="nodelet_pcl_demo" name="cluster_extraction" type="cluster_extractor" output="screen" />
+
+
+</launch>

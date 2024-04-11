@@ -10,6 +10,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 from inference_sdk import InferenceHTTPClient
+import message_filters
 
 class Matcher:
     def __init__(self, paths: list, object_types):
@@ -22,10 +23,12 @@ class image_converter:
 
   def __init__(self):
     self.image_pub = rospy.Publisher("kinect_classified",Image, queue_size=1)
-
+    self.depth_pub = rospy.Publisher("kinect_depth_classified",Image, queue_size=1)
     self.bridge = CvBridge()
-    self.image_sub = rospy.Subscriber("kinect_rgb",Image,self.callback, queue_size=1)
-
+    self.depth_sub = message_filters.Subscriber("kinect_depth", Image)
+    self.image_sub = message_filters.Subscriber("kinect_rgb",Image)
+    ts = message_filters.TimeSynchronizer([self.image_sub, self.depth_sub], 10)
+    ts.registerCallback(self.callback)
 
     self.project_id = "mcdonalds-waste"
     self.model_version = 1
@@ -34,8 +37,8 @@ class image_converter:
     # self.project_id = "10k"
     # self.model_version = 4  
   
-  def callback(self,data):
-    cv_image = self.bridge.imgmsg_to_cv2(data, "bgra8")
+  def callback(self,msg_color, msg_depth):
+    cv_image = self.bridge.imgmsg_to_cv2(msg_color, "bgra8")
     rospy.loginfo("cv_image_shape {}".format(cv_image.shape))
     results = self.client.infer(cv_image, model_id=f"{self.project_id}/{self.model_version}")
     success = 0
@@ -59,8 +62,9 @@ class image_converter:
       rospy.loginfo("Found no items")
     try:
       img_msg = self.bridge.cv2_to_imgmsg(cv_image, encoding="bgra8")
-      img_msg.header = data.header
+      img_msg.header = msg_color.header
       self.image_pub.publish(img_msg)
+      self.depth_pub.publish(msg_depth)
 
     except CvBridgeError as e:
       print(e)
